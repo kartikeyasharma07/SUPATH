@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SUPATH — Strategic Energy Transit Unit</title>
+<meta name="description" content="India-first decision support for crude supply chain resilience." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="css/app.css?v=15" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='13' fill='none' stroke='%231F6F43' stroke-width='2'/><path d='M3 16h26M16 3c4 4 4 22 0 26M16 3c-4 4-4 22 0 26' fill='none' stroke='%234C7C5C' stroke-width='1.2'/></svg>" />
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ================= sidebar ================= -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <circle cx="16" cy="16" r="13" stroke="#1F6F43" stroke-width="1.6"/>
+        <path d="M3 16h26M16 3c4.2 4 4.2 22 0 26M16 3c-4.2 4-4.2 22 0 26" stroke="#4C7C5C" stroke-width="1" opacity=".55"/>
+        <path d="M6.5 20.5c4-3 8-3 12 0s7 2 7 2" stroke="#1F6F43" stroke-width="1.6" stroke-linecap="round"/>
+        <circle cx="22" cy="11" r="2.4" fill="#1F6F43"/>
+      </svg>
+      <div class="brand-text">
+        <div class="name">SUPATH</div>
+        <div class="sub">Energy Transit Unit</div>
+      </div>
+    </div>
+
+    <nav class="nav" id="nav">
+      <button class="nav-item active" data-view="situation">
+        <svg class="nav-ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg>
+        <span><span class="nav-label">Live Overview</span><span class="nav-desc">What is happening now</span></span>
+      </button>
+      <button class="nav-item" data-view="risk">
+        <svg class="nav-ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3l9 16H3L12 3z"/><path d="M12 10v4M12 17h.01"/></svg>
+        <span><span class="nav-label">Risk Intelligence</span><span class="nav-desc">Why risk is what it is</span></span>
+      </button>
+      <button class="nav-item" data-view="scenario">
+        <svg class="nav-ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 19V5M4 19h16"/><path d="M7 15l4-5 3 3 5-7"/></svg>
+        <span><span class="nav-label">Scenario Simulator</span><span class="nav-desc">Cause and effect</span></span>
+      </button>
+      <button class="nav-item" data-view="brief">
+        <svg class="nav-ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3h9l5 5v13a1 1 0 01-1 1H6a1 1 0 01-1-1V4a1 1 0 011-1z"/><path d="M14 3v6h6M8 14h8M8 17h5"/></svg>
+        <span><span class="nav-label">Recommendations</span><span class="nav-desc">What to do about it</span></span>
+      </button>
+    </nav>
+
+    <div class="side-foot">
+      <div class="eyebrow">Data feeds</div>
+      <div class="feed-list" id="feeds"></div>
+    </div>
+  </aside>
+
+  <!-- ================= main ================= -->
+  <div class="main">
+    <header class="topbar">
+      <h1 id="view-title">Live Overview</h1>
+      <span class="ctx" id="view-ctx">India-bound crude corridors</span>
+      <span class="spacer"></span>
+      <span class="posture-chip" id="posture">
+        <span class="dot" id="posture-dot"></span>
+        <span id="posture-label">Assessing…</span>
+        <span class="score muted" id="posture-score"></span>
+      </span>
+      <button class="btn sm" id="refresh">Refresh</button>
+    </header>
+
+    <div class="scenario-banner" id="scenario-banner">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3l9 16H3L12 3zM12 10v4M12 17h.01"/></svg>
+      <span id="scenario-banner-text"></span>
+      <button id="clear-scenario">Return to live world</button>
+    </div>
+
+    <main class="view" id="view-situation"></main>
+    <main class="view" id="view-risk" hidden></main>
+    <main class="view" id="view-scenario" hidden></main>
+    <main class="view" id="view-brief" hidden></main>
+  </div>
+
+  <!-- ================= advisor rail ================= -->
+  <aside class="rail" id="rail">
+    <div class="rail-head">
+      <button class="icon-btn" id="collapse-rail" title="Collapse advisor">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
+      </button>
+      <span class="rail-title">Advisor</span>
+    </div>
+    <div class="rail-body" id="rail-body">
+      <div class="skeleton" style="height:120px"></div>
+    </div>
+  </aside>
+</div>
+
+<div class="modal-bg" id="modal-bg">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="modal-title">Impact</h3>
+      <button class="icon-btn" id="modal-close">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3-geo@3"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+<script src="js/api.js?v=15"></script>
+<script src="js/ui.js?v=15"></script>
+<script src="js/globe.js?v=15"></script>
+<script src="js/map.js?v=15"></script>
+<script src="js/situation.js?v=15"></script>
+<script src="js/riskview.js?v=15"></script>
+<script src="js/scenario.js?v=15"></script>
+<script src="js/brief.js?v=15"></script>
+<script src="js/app.js?v=15"></script>
+</body>
+</html>

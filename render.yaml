@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: supath
+    env: python
+    plan: free
+    buildCommand: "pip install -r requirements.txt && python scripts/install_abce.py"
+    startCommand: "uvicorn backend.main:app --host 0.0.0.0 --port $PORT"
+    healthCheckPath: /api/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0
+      # Every key below is optional — SUPATH runs with none of them set, using
+      # Yahoo Finance (no key needed) for prices and the corridor simulator
+      # for the map. Add a value in the Render dashboard (Environment tab)
+      # for any source you want to move from reference/simulated to live.
+      # sync: false means Render will never write a value into this file or
+      # the repo — it only stores it in the service's own environment.
+      - key: EIA_API_KEY
+        sync: false
+      - key: AISSTREAM_API_KEY
+        sync: false
+      - key: VESSELAPI_KEY
+        sync: false
+      - key: GDELT_CLOUD_API_KEY
+        sync: false
+      - key: OPENSANCTIONS_API_KEY
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false

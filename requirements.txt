@@ -1,0 +1,17 @@
+fastapi>=0.110
+uvicorn[standard]>=0.29
+httpx>=0.27
+websockets>=12.0
+reportlab>=4.1
+pydantic>=2.6
+dataset>=1.6          # abcEconomics imports this at runtime
+numpy>=1.24            # abcEconomics genuinely needs this — our setup.py patch
+                        # below strips its own (broken) numpy pin, so it must
+                        # be declared here instead, or a clean environment
+                        # (no numpy already present) fails at abcEconomics
+                        # import time, not install time — a much more
+                        # confusing place to debug.
+setuptools>=68        # abcEconomics installs with --no-build-isolation, which
+wheel>=0.42            # means it needs these already present, not auto-provided
+# abcEconomics is installed by scripts/install_abce.py — its published
+# setup.py has a malformed pin ("numpy >= 1.10.2p") that pip cannot parse.
