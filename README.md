@@ -20,7 +20,7 @@ from. Nothing is presented as an observation that is actually an estimate.
 
 ## Live demo
 
-**➡ [[https://supath.onrender.com](https://supath.onrender.com)](https://supath.onrender.com/)** *(update this link once deployed — see below)*
+**➡ [(https://supath.onrender.com)](https://supath.onrender.com/)** *(update this link once deployed — see below)*
 
 No installation needed — click it. The map runs on a deterministic corridor
 simulator (clearly labelled `SIM` throughout), prices come live from Yahoo
