@@ -20,7 +20,7 @@ from. Nothing is presented as an observation that is actually an estimate.
 
 ## Live demo
 
-**➡ [https://YOUR-APP-NAME.onrender.com](https://YOUR-APP-NAME.onrender.com)** *(update this link once deployed — see below)*
+**➡ [[https://supath.onrender.com](https://supath.onrender.com)](https://supath.onrender.com/)** *(update this link once deployed — see below)*
 
 No installation needed — click it. The map runs on a deterministic corridor
 simulator (clearly labelled `SIM` throughout), prices come live from Yahoo
@@ -28,52 +28,6 @@ Finance, and everything else runs exactly as described below. **First load
 after a period of inactivity can take 20–40 seconds** — this app runs on
 Render's free tier, which sleeps a service after 15 minutes with no traffic
 and wakes it back up on the next request. That's expected, not broken.
-
----
-
-## Deploying your own copy (Render, free tier)
-
-This repo includes `render.yaml`, so Render can configure almost everything
-automatically. You don't need to install Python, Docker, or anything else on
-your own machine to do this.
-
-1. **Push this repo to your own GitHub account** if you haven't already (see
-   *Repository structure* below for what belongs where).
-2. Go to **[render.com](https://render.com)** and sign up — the free plan
-   needs no credit card.
-3. From the Render dashboard, click **New → Blueprint**.
-4. Connect your GitHub account if prompted, then select this repository.
-   Render reads `render.yaml` automatically and pre-fills the service:
-   name `supath`, Python environment, the correct build and start commands.
-5. Render will list a handful of **optional** environment variables
-   (`EIA_API_KEY`, `AISSTREAM_API_KEY`, etc.) with blank values — you can
-   leave every single one empty and the app will run correctly, using Yahoo
-   Finance for prices and the simulator for the map. Only fill one in if you
-   specifically want that source live (see `.env.example` for what each one
-   unlocks and where to get a free key).
-6. Click **Apply** / **Create Web Service**. Render will build (installs
-   dependencies, then patches and installs abcEconomics — this step takes a
-   few minutes the first time) and deploy.
-7. When the build finishes, Render shows your live URL — something like
-   `https://supath-xxxx.onrender.com`. Open it. If the first load hangs for
-   20-40 seconds, that's the free-tier service waking up — refresh once it
-   responds and it'll be fast from then on until it sleeps again.
-8. Paste that URL into the *Live demo* link at the top of this README (and
-   into your competition submission form).
-
-**Keeping it awake for judging day (optional):** free-tier Render services
-sleep after 15 minutes of no traffic. If you want to avoid the wake-up delay
-during a specific judging window, a free service like
-[UptimeRobot](https://uptimerobot.com) can ping your `/api/health` endpoint
-every 10 minutes to keep it warm — not required, just a nice-to-have.
-
-**If the build fails:** check the build logs in the Render dashboard first —
-the abcEconomics install step is the most likely place for something
-environment-specific to go wrong. The scenario simulator has a documented
-analytic fallback (see `backend/engine/scenario.py`) that runs automatically
-if abcEconomics genuinely can't install, so a failed abcEconomics build
-doesn't have to block the whole deploy — but it's worth checking the logs
-either way.
 
 ---
 
@@ -107,60 +61,6 @@ supath/
 │                                                          the live Render deployment is
 │                                                          the primary way to use this)
 ```
-
-Everything under `backend/` and `frontend/` gets committed as-is. The only
-things that must **never** be committed are real API key values — `.env` is
-git-ignored specifically for this; `.env.example` (which has empty values) is
-the only one that belongs in the repo.
-
----
-
-## Running it locally (optional — most people won't need this)
-
-The Render deployment above is the primary way to use SUPATH. Run it locally
-only if you want to develop on it, or want live behavior your Render env
-vars aren't configured for during local testing.
-
-**Mac or Linux:** double-click `SUPATH-Mac-Linux.command` (first time, you may need to right-click → Open, since it's from an unidentified developer).
-**Windows:** double-click `SUPATH-Windows.bat`.
-
-Either one installs what's missing, starts the server, and opens Chrome to
-`http://localhost:8000` automatically. Leave the black terminal window open —
-closing it stops the site. **Python 3.10+ must already be installed** (from
-[python.org](https://www.python.org/downloads/)) — that's the one thing that
-can't be skipped, because the risk engine and the abcEconomics scenario
-simulator are real Python running on your machine, not a static page. Opening
-`frontend/index.html` directly in Chrome will not work — the browser blocks
-the API calls that drive every tab.
-
-## Running it — the terminal way
-
-```bash
-./run.sh
-```
-
-This installs dependencies (including a one-off patch for a broken
-`abcEconomics` release — see below), then serves the whole application,
-frontend and API together, at **http://localhost:8000**.
-
-No API keys are required to run it. Every external source has a documented
-fallback: a corridor tanker simulator, a reference Brent price series, a
-neutral-prior news signal, and so on. The UI always says, per number, which
-mode it is in — this is a deliberate feature, not a limitation to hide.
-
-To move a source from reference/simulated to live, copy `.env.example` to
-`.env` and add the relevant key (see that file for what each one unlocks),
-then run `./run.sh` again.
-
-### Manually, if you'd rather not use the script
-
-```bash
-pip install -r requirements.txt --break-system-packages
-python3 scripts/install_abce.py
-uvicorn backend.main:app --reload --port 8000
-```
-
----
 
 ## Architecture
 
@@ -303,7 +203,7 @@ brief, and the hackathon's own problem statement, cited in
 
 ## What each tab is actually for
 
-- **Situation** — the globe and the operating-picture map, Brent's move
+- **Live Overview** — the globe and the operating-picture map, Brent's move
   explained against concurrent corridor signals (not just quoted), Indian
   port health, and sea state at every chokepoint.
 - **Risk Intelligence** — every corridor's score broken into its five
@@ -316,7 +216,7 @@ brief, and the hackathon's own problem statement, cited in
   adjustable severity and horizon, a day-by-day playback of Brent, the import
   gap, strategic reserve cover, and refinery utilisation, and the full causal
   chain in plain language.
-- **Decision Brief** — the advisor's call and posture, ranked recommendations
+- **Recommendations** — the advisor's call and posture, ranked recommendations
   with quantified coverage/cost/lead-time and pre-screened counterparties,
   tripwires that say what would change the call, and a downloadable PDF.
 
